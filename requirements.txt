@@ -1,0 +1,19 @@
+# ── KisaanVaani requirements ──────────────────────────────────────────────────
+
+# Sarvam AI — speech-to-text + translation (Saarika v2.5 + Mayura v1)
+sarvamai
+
+# Groq — LLM inference (Llama 3.3 70B) used in intent, answer, schemes, advisory
+groq
+
+# Streamlit UI — st.audio_input (native mic widget) needs a reasonably recent version
+streamlit>=1.40
+
+# HTTP — mandi + weather data modules
+requests
+
+# Fuzzy string matching — mandi market-name matching
+rapidfuzz
+
+# TF-IDF retrieval — schemes + advisory knowledge base
+scikit-learn

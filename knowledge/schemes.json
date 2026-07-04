@@ -1,0 +1,50 @@
+[
+  {
+    "id": "pm-kisan",
+    "name": "PM-KISAN (Pradhan Mantri Kisan Samman Nidhi)",
+    "benefit": "₹6000/year direct benefit in 3 instalments of ₹2000",
+    "eligibility": "All landholding farmer families",
+    "how_to_apply": "Apply at pmkisan.gov.in or nearest CSC centre",
+    "documents": "Aadhaar, bank account, land records"
+  },
+  {
+    "id": "fasal-bima",
+    "name": "PM Fasal Bima Yojana (Crop Insurance)",
+    "benefit": "Subsidised crop insurance for Kharif and Rabi crops — premium 2% for Kharif, 1.5% for Rabi, 5% for horticulture",
+    "eligibility": "Farmers growing notified crops in notified areas",
+    "how_to_apply": "Apply through your bank or insurance company before sowing",
+    "documents": "Land records, bank account, Aadhaar"
+  },
+  {
+    "id": "kcc",
+    "name": "Kisan Credit Card (KCC)",
+    "benefit": "Low interest crop loan (4% after subvention), up to ₹3 lakh without collateral",
+    "eligibility": "Farmers, tenant farmers, and sharecroppers",
+    "how_to_apply": "Apply at any nationalised bank or cooperative bank",
+    "documents": "Land records, Aadhaar, passport photo"
+  },
+  {
+    "id": "krishi-sinchayee",
+    "name": "PM Krishi Sinchayee Yojana (Irrigation)",
+    "benefit": "Up to 55% subsidy on drip and sprinkler irrigation for small/marginal farmers",
+    "eligibility": "Small and marginal farmers investing in micro-irrigation",
+    "how_to_apply": "Apply through your state agriculture department",
+    "documents": "Land records, Aadhaar, bank account"
+  },
+  {
+    "id": "enam",
+    "name": "eNAM (National Agriculture Market)",
+    "benefit": "Online mandi platform for better price discovery across markets",
+    "eligibility": "Any farmer or trader registered with a participating mandi",
+    "how_to_apply": "Register at enam.gov.in",
+    "documents": "Aadhaar, bank account, mandi licence"
+  },
+  {
+    "id": "soil-health-card",
+    "name": "Soil Health Card Scheme",
+    "benefit": "Free soil testing and a health card every 2 years, with fertilizer recommendations for your field",
+    "eligibility": "All farmers",
+    "how_to_apply": "Contact your nearest Krishi Vigyan Kendra (KVK)",
+    "documents": "None — just land details"
+  }
+]

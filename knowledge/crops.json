@@ -1,0 +1,56 @@
+[
+  {
+    "crop": "wheat",
+    "aliases": [],
+    "sowing": "October-November (Rabi season)",
+    "harvest": "March-April",
+    "pests": "aphids, rust fungus, armyworm",
+    "fertilizer": "NPK 120:60:40 kg/ha, apply urea in 2 splits",
+    "water": "4-6 irrigations, critical at crown root stage"
+  },
+  {
+    "crop": "rice",
+    "aliases": ["paddy"],
+    "sowing": "June-July (Kharif season)",
+    "harvest": "October-November",
+    "pests": "brown planthopper, stem borer, blast disease",
+    "fertilizer": "NPK 100:50:50 kg/ha",
+    "water": "keep 5cm standing water during tillering"
+  },
+  {
+    "crop": "onion",
+    "aliases": [],
+    "sowing": "October-November (Rabi), June-July (Kharif)",
+    "harvest": "90-120 days after transplanting",
+    "pests": "purple blotch, thrips, basal rot",
+    "fertilizer": "NPK 100:50:50 kg/ha + sulphur 20kg/ha",
+    "water": "light and frequent, avoid waterlogging"
+  },
+  {
+    "crop": "tomato",
+    "aliases": [],
+    "sowing": "June-July and October-November",
+    "harvest": "60-80 days after transplanting",
+    "pests": "fruit borer, leaf curl virus, early blight",
+    "fertilizer": "NPK 100:60:80 kg/ha",
+    "water": "drip irrigation preferred, 600-800mm total"
+  },
+  {
+    "crop": "cotton",
+    "aliases": [],
+    "sowing": "April-May (Maharashtra), May-June (Punjab)",
+    "harvest": "October-November",
+    "pests": "bollworm, whitefly, mealybug",
+    "fertilizer": "NPK 120:60:60 kg/ha",
+    "water": "critical at flowering and boll development stages"
+  },
+  {
+    "crop": "sugarcane",
+    "aliases": [],
+    "sowing": "February-March",
+    "harvest": "12-18 months after planting",
+    "pests": "internode borer, woolly aphid, red rot",
+    "fertilizer": "NPK 250:85:85 kg/ha applied in splits",
+    "water": "high water need, 1500-2500mm"
+  }
+]
