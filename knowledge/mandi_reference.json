@@ -1,0 +1,8 @@
+{
+  "wheat": {"price": "2275", "unit": "per quintal"},
+  "rice": {"price": "2183", "unit": "per quintal"},
+  "onion": {"price": "1200", "unit": "per quintal"},
+  "tomato": {"price": "1000", "unit": "per quintal"},
+  "cotton": {"price": "7000", "unit": "per quintal"},
+  "sugarcane": {"price": "340", "unit": "per quintal"}
+}

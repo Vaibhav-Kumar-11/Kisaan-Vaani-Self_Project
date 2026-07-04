@@ -28,30 +28,29 @@ voice/text input
 
 Each pipeline stage is a small, independently testable module under `pipeline/`. Nothing here needed a multi-agent framework — the four question types are a straightforward classification problem, so a plain if/elif router does the job without pretending it's more complex than it is.
 
-## Decisions I'd actually defend in an interview
+## Why some things are built the way they are
 
-A few things I changed from the original that I can explain the reasoning for, not just describe:
+- **Retrieval instead of one giant prompt.** Schemes and crop advisory used to be one big string pasted into every LLM call. Now each scheme/crop is its own record under `knowledge/`, and a small TF-IDF + cosine-similarity search (`retrieval.py`) finds the right one before the LLM even sees the question. I went with TF-IDF over embeddings mainly because the knowledge base is small and the queries are keyword-heavy (crop names, scheme names) — pulling in `sentence-transformers`/`torch` for this would slow down cold starts on a free-tier deploy without actually improving the results.
+- **Retrieval carries the facts, the LLM only writes the phrasing.** For schemes specifically, the LLM never invents the benefit amount or eligibility — those always come straight from the JSON record, and the model only writes the short explanation around them. Getting a scheme's benefit wrong is a real problem (it's someone's money), so I didn't want that part depending on the model getting it right every time.
+- **Mandi price lookup is fuzzy-matched, not exact.** The government dataset's own filters only match commodity/market names exactly, so someone typing "Nasik" instead of "Nashik" used to just get nothing back. Now it pulls a batch of records for the crop and ranks them against whatever location was given, using `rapidfuzz`. There's a test that reproduces this exact typo and checks the fix.
+- **The mandi API also turned out to be genuinely unreliable, not just slow.** It's a public test key shared by a huge number of similar projects, and I had stretches during development where even a 30-second request got nothing back. Rather than show "price unavailable" every time that happens, successful lookups are cached for a few hours (prices lag 1-2 days anyway, so this doesn't serve stale data in any way that matters), and if a live call fails outright, there's a small reference-price table for the crops in the knowledge base — clearly labeled as an estimate, not a live number, so it's still honest.
+- **Every LLM call that expects JSON back has a real fallback.** The original code did `raw.find("{")` / `json.loads()` with nothing around it — one slightly off response would crash the whole request. There's a small retry-once helper (`pipeline/llm_json.py`) now, and every stage has an actual fallback answer instead of a stack trace.
+- **The interface itself changes language, not just the answer.** The original mixed languages — English labels even when Hindi was selected, which kind of defeats the point for someone who might not read English comfortably. Labels, buttons, instructions, and status messages all switch with the language dropdown now. Hindi I'm confident about. Marathi and Punjabi are my own translations using fairly standard, simple words — I haven't had a native speaker check them yet, so the phrasing could probably be tightened.
+- **The mic widget is Streamlit's own `st.audio_input`,** not a third-party component. The old one (`audio-recorder-streamlit`) rendered in an iframe with its own styling that never quite matched the rest of the page; the native one just follows the app's theme.
 
-- **Retrieval over hardcoded prompts.** Schemes and crop advisory used to be one giant string pasted into every LLM call. Now each scheme/crop is its own record in `knowledge/`, and a small TF-IDF + cosine-similarity retriever (`retrieval.py`) finds the right one before the LLM ever sees the question. I chose TF-IDF over embeddings on purpose — the knowledge base is a handful of short, keyword-heavy documents (crop names, scheme names), so lexical matching works well, and it skips pulling in `torch`/`sentence-transformers`, which would slow down cold starts on a free-tier deploy for no real benefit at this scale.
-- **Retrieval carries the facts, the LLM only phrases them.** For schemes specifically, the LLM never generates the benefit amount or eligibility — those come straight from the JSON record. It only writes the 2-3 sentence explanation. A hallucinated scheme benefit is a real harm (wrong money information), so that risk is scoped to phrasing only, not facts.
-- **Mandi price lookup is fuzzy-matched, not exact.** The government dataset's own filters are exact-string matches, so a farmer typing "Nasik" instead of "Nashik" used to just get zero results back. Now it fetches a batch of records for the crop and ranks them against the requested location with `rapidfuzz` client-side. There's a test (`test_get_mandi_price_fuzzy_matches_misspelled_market`) that reproduces this exact bug and confirms the fix.
-- **Every LLM call that expects JSON back has a real fallback.** The original code did `raw.find("{")` / `json.loads()` with no error handling anywhere — one off-format response would crash the whole request. Now there's a shared retry-once-then-fallback helper (`pipeline/llm_json.py`), and every stage has a sensible degraded answer instead of a stack trace.
-- **Full UI localization was a deliberate scope call, not a given.** The original interface mixed languages inconsistently — labels in English even when Hindi was selected, which defeats the point of an app aimed at people who may not read English comfortably. I localized the primary interface (labels, buttons, instructions, status text, the two most common warnings) across all four languages. I'm confident in the Hindi strings; Marathi and Punjabi are my best effort with standard, simple vocabulary, not verified by a native speaker — that's an honest gap, and the natural next step if this gets more use.
-- **The mic widget is Streamlit's native `st.audio_input`,** not a third-party component. The original used `audio-recorder-streamlit`, which renders in an iframe with its own styling that never quite matched the rest of the app. Native `st.audio_input` follows the app's own theme automatically and removes a dependency that hadn't been updated in a while.
+## Known limitations
 
-## Known limitations (said honestly, not hidden)
-
-- **data.gov.in's mandi price API uses a shared public test key** that a huge number of student/hackathon projects use — while building this, I hit stretches where it was completely unresponsive (not just slow; a 30-second one-shot request got nothing back). The app fails fast (~12s worst case) and gives a sensible "couldn't find current price data" answer rather than hanging or crashing, but the honest fix is getting a personal, non-shared API key from data.gov.in.
-- **Marathi and Punjabi UI strings** are my own best-effort translations of simple, standard vocabulary, not reviewed by a native speaker.
-- **No conversation memory.** Each question is independent — asking about onion prices in Nashik and then "what about wheat?" won't carry the location over. Deliberately out of scope for this version to keep the surface area small and fully testable; a natural next step if it's worth the added state-management complexity.
+- **data.gov.in's mandi API is shared and unreliable.** Even with the caching and reference-price fallback above, live prices won't always be current — the real fix is getting a personal (non-shared) API key from data.gov.in instead of using the public test key.
+- **Marathi and Punjabi interface text** is my own translation, not checked by a native speaker.
+- **No conversation memory.** Each question is independent — asking about onion prices in Nashik and then "what about wheat?" won't carry the location over. Left out on purpose to keep the scope small and fully testable; would add if this ever needed to feel more like a conversation.
 
 ## Testing
 
-39 automated pytest tests under `tests/`, covering:
+42 automated pytest tests under `tests/`, covering:
 - Intent extraction and its fallback when the LLM output can't be parsed
 - Routing logic for all four question types
 - Weather (geocoding + forecast, including failure paths)
-- Mandi price lookup, including the fuzzy-match fix above
+- Mandi price lookup — the fuzzy-match fix, the caching, and the reference-price fallback
 - Scheme and advisory retrieval + their LLM-failure fallbacks
 - Answer generation and its fallback template
 - The shared JSON-retry helper's retry-once behavior specifically

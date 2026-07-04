@@ -55,6 +55,9 @@ Instructions:
 - Use specific numbers and facts from the data above
 - Keep it short — 2 to 3 sentences max
 - Avoid technical jargon — farmer must understand it easily
+- If the source field says this is a reference estimate rather than a live
+  quote, say so plainly in the answer instead of presenting it as today's
+  exact price
 
 Return ONLY a JSON object in exactly this format:
 {{

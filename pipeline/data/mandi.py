@@ -5,7 +5,20 @@ means a farmer typing "Nasik" instead of "Nashik" — or the district name
 instead of the exact APMC market name — silently gets zero records back.
 Instead of filtering by market server-side, we fetch a batch of records
 for the crop and fuzzy-rank them against the requested location ourselves.
+
+The public test key also turned out to be genuinely unreliable in
+practice — not just slow, completely unresponsive for stretches, since
+it's shared by a large number of similar student projects. Two things
+handle that: successful live lookups are cached for a few hours (prices
+lag 1-2 days anyway, so this doesn't serve stale data in any way that
+matters), and if a live call fails outright, a small reference-price
+table for the crops in the knowledge base is used instead of returning
+nothing — clearly marked as an estimate, not a live quote.
 """
+import json
+import time
+from pathlib import Path
+
 import requests
 from rapidfuzz import fuzz
 from requests.adapters import HTTPAdapter
@@ -21,14 +34,29 @@ BASE_URL = f"https://api.data.gov.in/resource/{RESOURCE_ID}"
 
 FUZZY_MATCH_THRESHOLD = 60
 
+REFERENCE_PRICES_PATH = Path(__file__).resolve().parents[2] / "knowledge" / "mandi_reference.json"
+REFERENCE_PRICES = json.loads(REFERENCE_PRICES_PATH.read_text(encoding="utf-8"))
+
+CACHE_TTL_SECONDS = 6 * 60 * 60
+_cache: dict[tuple, tuple[float, dict]] = {}
+
+
+def _cache_get(key: tuple) -> dict | None:
+    entry = _cache.get(key)
+    if entry is None:
+        return None
+    cached_at, value = entry
+    if time.time() - cached_at > CACHE_TTL_SECONDS:
+        del _cache[key]
+        return None
+    return value
+
+
+def _cache_set(key: tuple, value: dict) -> None:
+    _cache[key] = (time.time(), value)
+
 
 def _session() -> requests.Session:
-    """data.gov.in's shared public test key is used by a huge number of
-    student/hackathon projects and is occasionally completely unresponsive
-    rather than just slow — verified this directly: even a 30s one-shot
-    request got no response. One retry is kept in case a given failure is
-    transient, but the timeout is kept short so a genuinely dead endpoint
-    fails fast instead of leaving the farmer staring at a spinner."""
     s = requests.Session()
     s.mount("https://", HTTPAdapter(max_retries=Retry(
         total=1,
@@ -49,6 +77,22 @@ def _empty_result(crop, location) -> dict:
         "market": None,
         "date": None,
         "source": "data.gov.in",
+    }
+
+
+def _reference_fallback(crop: str, location) -> dict:
+    ref = REFERENCE_PRICES.get(crop.lower())
+    if not ref:
+        return _empty_result(crop, location)
+
+    return {
+        "crop": crop,
+        "location": location,
+        "price": ref["price"],
+        "unit": ref["unit"],
+        "market": None,
+        "date": None,
+        "source": "reference estimate — data.gov.in isn't responding right now, this is not a live quote",
     }
 
 
@@ -82,6 +126,12 @@ def get_mandi_price(crop: str | None, location: str | None) -> dict:
         print("Mandi        : no crop specified, cannot look up a price")
         return _empty_result(crop, location)
 
+    cache_key = (crop.lower(), (location or "").lower())
+    cached = _cache_get(cache_key)
+    if cached is not None:
+        print(f"Mandi        : serving cached price for {crop}/{location}")
+        return cached
+
     params = {
         "api-key": API_KEY,
         "format": "json",
@@ -97,8 +147,8 @@ def get_mandi_price(crop: str | None, location: str | None) -> dict:
         records = response.json().get("records", [])
 
         if not records:
-            print(f"Mandi        : no records found for {crop}")
-            return _empty_result(crop, location)
+            print(f"Mandi        : no records found for {crop}, using reference price")
+            return _reference_fallback(crop, location)
 
         rec = _best_market_match(records, location)
 
@@ -113,8 +163,9 @@ def get_mandi_price(crop: str | None, location: str | None) -> dict:
         }
 
         print(f"Mandi        : price = Rs.{result['price']} {result['unit']} at {result['market']} on {result['date']}")
+        _cache_set(cache_key, result)
         return result
 
     except requests.RequestException as e:
-        print(f"Mandi        : API error — {e}")
-        return _empty_result(crop, location)
+        print(f"Mandi        : API error — {e}, using reference price")
+        return _reference_fallback(crop, location)
