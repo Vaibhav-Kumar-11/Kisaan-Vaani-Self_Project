@@ -85,7 +85,9 @@ streamlit run app.py
 
 ## Deployment
 
-Deployed on Streamlit Community Cloud: *(link goes here once live)*
+Live on Streamlit Community Cloud: **[kisaan-vaani.streamlit.app](https://kisaan-vaani.streamlit.app/)**
+
+If it's been quiet for a while, the first load can take 30-60 seconds while the free-tier instance wakes up — that's normal, not a bug.
 
 ## Stack
 
