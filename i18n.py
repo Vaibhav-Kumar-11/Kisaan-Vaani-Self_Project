@@ -41,6 +41,7 @@ UI_STRINGS = {
         "footer_sources": "Data sources: data.gov.in · open-meteo.com · Sarvam AI · Groq",
         "err_stt_failed": "Couldn't process that recording. Please try again or type your question.",
         "err_no_speech": "Didn't catch any speech in that recording. Please try again.",
+        "record_again_button": "🔄 Record again",
     },
     "hi-IN": {
         "select_language": "अपनी भाषा चुनें",
@@ -67,6 +68,7 @@ UI_STRINGS = {
         "footer_sources": "डेटा स्रोत: data.gov.in · open-meteo.com · Sarvam AI · Groq",
         "err_stt_failed": "रिकॉर्डिंग समझ नहीं आई। कृपया फिर से कोशिश करें या अपना सवाल लिखें।",
         "err_no_speech": "रिकॉर्डिंग में कोई आवाज़ नहीं मिली। कृपया फिर से कोशिश करें।",
+        "record_again_button": "🔄 फिर से रिकॉर्ड करें",
     },
     "mr-IN": {
         "select_language": "तुमची भाषा निवडा",
@@ -93,6 +95,7 @@ UI_STRINGS = {
         "footer_sources": "डेटा स्रोत: data.gov.in · open-meteo.com · Sarvam AI · Groq",
         "err_stt_failed": "रेकॉर्डिंग समजले नाही. कृपया पुन्हा प्रयत्न करा किंवा प्रश्न लिहा.",
         "err_no_speech": "रेकॉर्डिंगमध्ये आवाज सापडला नाही. कृपया पुन्हा प्रयत्न करा.",
+        "record_again_button": "🔄 पुन्हा रेकॉर्ड करा",
     },
     "pa-IN": {
         "select_language": "ਆਪਣੀ ਭਾਸ਼ਾ ਚੁਣੋ",
@@ -119,6 +122,7 @@ UI_STRINGS = {
         "footer_sources": "ਡਾਟਾ ਸਰੋਤ: data.gov.in · open-meteo.com · Sarvam AI · Groq",
         "err_stt_failed": "ਰਿਕਾਰਡਿੰਗ ਸਮਝ ਨਹੀਂ ਆਈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ ਜਾਂ ਆਪਣਾ ਸਵਾਲ ਲਿਖੋ।",
         "err_no_speech": "ਰਿਕਾਰਡਿੰਗ ਵਿੱਚ ਕੋਈ ਆਵਾਜ਼ ਨਹੀਂ ਮਿਲੀ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।",
+        "record_again_button": "🔄 ਦੁਬਾਰਾ ਰਿਕਾਰਡ ਕਰੋ",
     },
 }
 

@@ -39,9 +39,25 @@ transcription_result = None
 
 with tab_voice:
     st.markdown(t("voice_instructions", language_code))
-    audio_value = st.audio_input(t("audio_input_label", language_code))
+
+    # st.audio_input has no built-in way to discard a bad take and record a
+    # fresh one — once it has a value, re-recording just replaces the old
+    # clip without a clean "start over" path. Bumping this counter changes
+    # the widget's key, which forces Streamlit to treat it as a brand-new
+    # widget with no prior value.
+    if "voice_attempt" not in st.session_state:
+        st.session_state.voice_attempt = 0
+
+    audio_value = st.audio_input(
+        t("audio_input_label", language_code),
+        key=f"audio_input_{st.session_state.voice_attempt}",
+    )
 
     if audio_value:
+        if st.button(t("record_again_button", language_code)):
+            st.session_state.voice_attempt += 1
+            st.rerun()
+
         with tempfile.NamedTemporaryFile(suffix=".wav", delete=False) as tmp:
             tmp.write(audio_value.getvalue())
             tmp_path = tmp.name
